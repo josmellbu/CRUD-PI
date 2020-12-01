@@ -8,7 +8,7 @@ import (
 )
 
 func EstudianteGetId(c *gin.Context) {
-	id := c.Params.ByName("id")
+	id := c.Param("id")
 	var est models.Estudiante
 	db, _ := c.Get("db")
 	conn := db.(gorm.DB)
@@ -32,12 +32,14 @@ func EstudianteIndex(c *gin.Context) {
 func EstudiantePost(c *gin.Context) {
 	db, _ := c.Get("db")
 	conn := db.(gorm.DB)
-	est := models.Estudiante{Name:		c.PostForm("name"), 
-							Paternal: 	c.PostForm("paternal"), 
-							Maternal: 	c.PostForm("maternal"),
-							Age:		c.PostForm("age"),
-							State:		c.PostForm("state"),
-		}
+	var est models.Estudiante
+	//est := models.Estudiante{Name: c.PostForm("name"),Paternal: c.PostForm("paternal"),Maternal: c.PostForm("maternal"), Age: c.PostForm("age"), State: c.PostForm("state"),}
+	if err := c.BindJSON(&est); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 	conn.Create(&est)
 	c.JSON(http.StatusOK, &est)
 }
@@ -56,6 +58,7 @@ func EstudiantePut(c *gin.Context) {
 	est.Name = c.PostForm("name")
 	est.Paternal = c.PostForm("paternal")
 	est.Maternal = c.PostForm("maternal")
+	c.BindJSON(&est)
 	conn.Save(&est)
 	c.JSON(http.StatusOK, &est)
 }

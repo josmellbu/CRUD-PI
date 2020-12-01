@@ -32,7 +32,14 @@ func CursosIndex(c *gin.Context) {
 func CursosPost(c *gin.Context) {
 	db, _ := c.Get("db")
 	conn := db.(gorm.DB)
-	cur := models.Cursos{Name: c.PostForm("name"), Period: c.PostForm("period"), State: c.PostForm("state")}
+	var cur models.Cursos
+	//cur := models.Cursos{Name: c.PostForm("name"), Period: c.PostForm("period"), Note: c.PostForm("note"), State: c.PostForm("state")}
+		if err := c.BindJSON(&cur); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 	conn.Create(&cur)
 	c.JSON(http.StatusOK, &cur)
 }
@@ -49,7 +56,10 @@ func CursosPut(c *gin.Context) {
 		return
 	}
 	cur.Name = c.PostForm("name")
-	cur.Period = c.PostForm("age")
+	cur.Period = c.PostForm("period")
+	cur.Note = c.PostForm("note")
+	cur.State = c.PostForm("state")
+	c.BindJSON(&cur)
 	conn.Save(&cur)
 	c.JSON(http.StatusOK, &cur)
 }

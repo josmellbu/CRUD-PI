@@ -6,7 +6,8 @@ import (
 
 type Cursos struct {
     gorm.Model
-	Name 		string
-	Period	 	string
-	State		string
+	Name 		string `json:"name"`
+	Period	 	string `json:"period"`
+	Note		string `json:"note"`
+	State		string `json:"state"`
 }
